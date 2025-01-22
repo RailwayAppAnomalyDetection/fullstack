@@ -1,4 +1,4 @@
-{
+{ //configuration file, what should be typechecked
   "compilerOptions": {
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
