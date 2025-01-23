@@ -1,6 +1,7 @@
 import React from 'react'
-
+// use hook if params accessed in other file
 const page = ({params}:{params: {id:string}}) => {
+  
   const { id } = params;
   return (
     <div>
