@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/font": "^14.2.15",
     "ai": "^4.1.1",
     "fullstack": "file:",
     "next": "15.1.5",
