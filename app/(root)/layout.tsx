@@ -9,13 +9,26 @@ const layout = ({children}:{children: React.ReactNode}) => {
           <button className="text-left hover:bg-blue-700 p-2 rounded">Home</button>
           <details className="group">
             <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded">Measurement</summary>
-            <div className="pl-4 space-y-2">
-              <button className="hover:underline">Assessment</button>
-              <button className="hover:underline">Regular Train</button>
+            <div className="pl-4 space-y-2 flex flex-col">
+              <button className="text-left hover:bg-blue-700 p-2 rounded">Assessment</button>
+              <button className="text-left hover:bg-blue-700 p-2 rounded">Reguler Train</button>
+              <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button>
+              {/* <button className="hover:underline">Assessment</button>
+              <button className="hover:underline">Regular Train</button> */}
             </div>
           </details>
-          <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button>
+          {/* <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button> */}
           <details className="group">
+            <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded">Data & Analytics</summary>
+            <div className="pl-4 space-y-2 flex flex-col">
+              <button className="text-left hover:bg-blue-700 p-2 rounded">Analytics Maps</button>
+              <button className="text-left hover:bg-blue-700 p-2 rounded">Search Data</button>
+              <button className="text-left hover:bg-blue-700 p-2 rounded">Station</button>
+              {/* <button className="hover:underline">Assessment</button>
+              <button className="hover:underline">Regular Train</button> */}
+            </div>
+          </details>
+          {/* <details className="group">
             <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded">Data & Analytics</summary>
             <div className="pl-4 space-y-2">
               <button className="hover:underline">Analytics Maps</button>
@@ -23,7 +36,8 @@ const layout = ({children}:{children: React.ReactNode}) => {
               <button className="hover:underline">Station</button>
               <button className="hover:underline">Device</button>
             </div>
-          </details>
+          </details> */}
+          <button className="text-left hover:bg-blue-700 p-2 rounded">Device</button>
           <button className="text-left hover:bg-blue-700 p-2 rounded">Setting</button>
         </nav>
       </aside>
