@@ -2,7 +2,7 @@ import React from 'react'
 
 const layout = ({children}:{children: React.ReactNode}) => {
   return (
-    <div>
+    <div className="flex h-screen overflow-hidden">
       <aside className="bg-blue-900 text-white w-1/5 p-4">
         <h1 className="text-2xl font-bold mb-6">Railway comfort indicator</h1>
         <nav className="flex flex-col gap-4">
@@ -41,7 +41,11 @@ const layout = ({children}:{children: React.ReactNode}) => {
           <button className="text-left hover:bg-blue-700 p-2 rounded">Setting</button>
         </nav>
       </aside>
-      {children}
+      {/* {children} */}
+      {/* メインコンテンツ */}
+      <main className="flex-1 p-6 bg-gray-100">
+        {children}
+      </main>
     </div>
   )
 }
