@@ -1,7 +1,16 @@
+"use client";
 // pages/index.tsx
 //import Layout from "../layout";
+import dynamic from "next/dynamic";
+
+// Dynamically import Leaflet components
+const MapContainer = dynamic(() => import('react-leaflet').then((mod) => mod.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import('react-leaflet').then((mod) => mod.TileLayer), { ssr: false });
+const Marker = dynamic(() => import('react-leaflet').then((mod) => mod.Marker), { ssr: false });
+const Popup = dynamic(() => import('react-leaflet').then((mod) => mod.Popup), { ssr: false });
 
 const Home = () => {
+  const position:[number,number] = [51.505, -0.09];
   return (
     
     <div className="space-y-4">
@@ -15,33 +24,7 @@ const Home = () => {
       </div>
 
       {/* Main Panel */}
-      {/* <div className="bg-gray-300 h-96 rounded-md"></div> */}
-      <div className="h-96 rounded-md overflow-hidden">
-        <iframe
-          width="100%"
-          height="100%"
-          // src="https://www.openstreetmap.org/export/embed.html?bbox=105.29296875%2C-16.13026201203474%2C118.52050781250001%2C-0.19775351362548124&amp;layer=mapnik"
-          src="https://www.openstreetmap.org/export/embed.html?bbox=110.334%2C-7.825%2C110.406%2C-7.769&amp;layer=mapnik"
-          style={{ border: "1px solid black" }}
-        ></iframe>
-        <div className="text-center mt-2">
-          <small>
-            <a
-              // href="https://www.openstreetmap.org/#map=6/-8.24/111.91"
-              // target="_blank"
-              // rel="noopener noreferrer"
-              // className="text-blue-600 hover:underline"
-              href="https://www.openstreetmap.org/#map=13/-7.7971/110.3705"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              大きな地図を表示
-            </a>
-          </small>
-        </div>
-      </div>
-
+      <div className="bg-gray-300 h-96 rounded-md"></div>
     </div>
 
   );
