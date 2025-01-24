@@ -1,14 +1,12 @@
 // import React from 'react';
 import Link from "next/link"; 
 
-<<<<<<< HEAD
 const Layout = ({ children }: { children: React.ReactNode }) => {
->>>>>>> a2abf99f94bf0081d23b4d5256f10c796e8ad39c
   return (
     <div className="flex h-screen overflow-hidden">
       {/* サイドバー */}
       <aside className="bg-blue-900 text-white w-1/6 p-4 flex flex-col">
-        <h1 className="text-2xl font-bold mb-6">Railway Comfort Indicator</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Railway Comfort Indicator</h1>
         <nav className="flex flex-col gap-4">
           <Link href="/home">
             <button className="w-full text-left hover:bg-blue-700 p-2 rounded">Home</button>
