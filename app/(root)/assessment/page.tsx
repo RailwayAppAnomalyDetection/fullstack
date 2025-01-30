@@ -1,17 +1,19 @@
+"use client"
 // pages/index.tsx
 //import Layout from "../layout";
+import React from "react";
+import Button from "@/app/components/button";
 
 const Home = () => {
+  const handleClick = () => {
+    console.log('Button clicked');
+  }
   return (
     
     <div className="space-y-4">
       {/* Top Boxes */}
-      <div className="grid grid-cols-5 gap-4">
-        <div className="bg-blue-900 h-12 rounded-md"></div>
-        {/* <div className="bg-blue-900 h-24 rounded-md"></div>
-        <div className="bg-blue-900 h-24 rounded-md"></div> */}
-      </div>
-
+      <Button onClick={handleClick} color="#003C7C">Click Me</Button>
+      
       {/* Main Panel */}
       {/* <div className="bg-gray-300 h-96 rounded-md"></div> */}
     </div>
