@@ -4,6 +4,9 @@ import { House } from "lucide-react";
 import { Gauge } from "lucide-react";
 import { Grid3x3 } from "lucide-react";
 import { LogOut } from "lucide-react";
+import { Microchip } from "lucide-react";
+import { Settings } from "lucide-react";
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
@@ -13,10 +16,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <h1 className="text-2xl font-bold mb-6 text-center">Railway Comfort Indicator</h1>
         <nav className="flex flex-col gap-4">
           <Link href="/home">
-            <button className="w-full text-left hover:bg-blue-700 p-2 rounded">Home</button>
+            <button className="w-full text-left hover:bg-blue-700 p-2 rounded flex items-center gap-x-4"><House/>Home</button>
           </Link>
           <details className="group">
-            <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded">Measurement</summary>
+            <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded flex items-center gap-x-4"><Gauge/>Measurement</summary>
             <div className="pl-4 space-y-2 flex flex-col">
               <Link href="/assessment">
                 <button className="w-full text-left hover:bg-blue-700 p-2 rounded">Assessment</button>
@@ -26,15 +29,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </details>
           <details className="group">
-            <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded">Data & Analytics</summary>
+            <summary className="cursor-pointer hover:bg-blue-700 p-2 rounded flex items-center gap-x-4"><Grid3x3/> Data & Analytics</summary>
             <div className="pl-4 space-y-2 flex flex-col">
               <button className="text-left hover:bg-blue-700 p-2 rounded">Analytics Maps</button>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Search Data</button>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Station</button>
             </div>
           </details>
-          <button className="text-left hover:bg-blue-700 p-2 rounded">Device</button>
-          <button className="text-left hover:bg-blue-700 p-2 rounded">Setting</button>
+          <button className="text-left hover:bg-blue-700 p-2 rounded flex items-center gap-x-4"><Microchip/>Device</button>
+          <button className="text-left hover:bg-blue-700 p-2 rounded flex items-center gap-x-4"><Settings/>Setting</button>
         </nav>
       </aside>
 
