@@ -1,7 +1,9 @@
 // import React from 'react';
 import Link from "next/link"; 
-
-
+import { House } from "lucide-react";
+import { Gauge } from "lucide-react";
+import { Grid3x3 } from "lucide-react";
+import { LogOut } from "lucide-react";
 const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
@@ -43,16 +45,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* アイコンメニュー */}
           <nav className="flex space-x-6">
             <button className="hover:bg-blue-700 p-2 rounded">
-              <span className="material-icons">home</span>
+              <span className="material-icons"><House/></span>
             </button>
             <button className="hover:bg-blue-700 p-2 rounded">
-              <span className="material-icons">cloud</span>
+              <span className="material-icons"><Gauge/></span>
             </button>
             <button className="hover:bg-blue-700 p-2 rounded">
-              <span className="material-icons">settings</span>
+              <span className="material-icons"><Grid3x3/></span>
             </button>
             <button className="hover:bg-blue-700 p-2 rounded">
-              <span className="material-icons">logout</span>
+              <span className="material-icons"><LogOut/></span>
             </button>
           </nav>
         </header>
