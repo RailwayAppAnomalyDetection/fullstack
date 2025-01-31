@@ -1,9 +1,9 @@
 // import React from 'react';
 import Link from "next/link"; 
 
-<<<<<<< HEAD
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
->>>>>>> a2abf99f94bf0081d23b4d5256f10c796e8ad39c
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* サイドバー */}
