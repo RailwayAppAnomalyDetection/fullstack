@@ -1,14 +1,28 @@
+"use client"
 // pages/index.tsx
 //import Layout from "../layout";
-
+import { Gauge } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 const Home = () => {
+   const pathname = usePathname();
+    const isActive = (path:string) => pathname === path;
   return (
     
     <div className="space-y-4">
       {/* Top Boxes */}
       <div className="grid grid-cols-4 gap-4">
         {/* 1つのボックスは4列幅中の3列分を占有 */}
-        <div className="bg-blue-900 h-24 rounded-md col-span-1"></div>
+        <div className="bg-blue-900 h-24 rounded-md col-span-1">
+          <div className="flex items-center">
+            <Link href="/assessment">
+              <button className="w-full flex items-center gap-2 p-3 rounded">
+              <Gauge className="w-5 h-5" /> 
+              <span className="text-white font-medium">Assessment</span>
+              </button>
+            </Link>
+          </div>
+        </div>
         <div className="bg-blue-900 h-24 rounded-md col-span-1"></div>
         <div className="bg-blue-900 h-24 rounded-md col-span-1"></div>
         {/* 一番右の空白部分（スタイルなし） */}
