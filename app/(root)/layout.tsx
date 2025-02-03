@@ -7,6 +7,8 @@ import { LogOut } from "lucide-react";
 import { Microchip } from "lucide-react";
 import { Settings } from "lucide-react";
 
+
+
 const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
@@ -23,6 +25,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="pl-4 space-y-2 flex flex-col">
               <Link href="/assessment">
                 <button className="w-full text-left hover:bg-blue-700 p-2 rounded">Assessment</button>
+              </Link>
+
+              <Link href='/viewdata'>
+              <button className="text-left hover:bg-blue-700 p-2 rounded">View Data</button>
               </Link>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Regular Train</button>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button>
