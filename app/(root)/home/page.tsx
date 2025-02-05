@@ -2,29 +2,104 @@
 // pages/index.tsx
 //import Layout from "../layout";
 import { Gauge } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Papa from "papaparse";
+import React, { ChangeEvent, useState } from 'react'
+
+interface DataRow {
+  speed: number;
+  Ride_Comfort_Index: number;
+  coordinate: string;
+} 
+
 const Home = () => {
-   const pathname = usePathname();
-    const isActive = (path:string) => pathname === path;
+  const [maxSpeed, setMaxSpeed] = useState<number | null>(null);
+  const [maxComfortIndex, setMaxComfortIndex] = useState<number | null>(null);
+  const [minComfortCoord, setMinComfortCoord] = useState<string | null>(null);
+  const [maxComfortCoord, setMaxComfortCoord] = useState<string | null>(null);
+
+  const handleFileUpload = (event : ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]; // Use optional chaining to safely access files
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        complete: (results) => {
+          const data = results.data as DataRow[];
+          calculateStatistics(data);
+        },
+      });
+    }
+  };
+
+  const calculateStatistics = (data: DataRow[]) => {
+    if (data.length === 0) return;
+
+    // Calculate max speed
+    const speeds = data.map(row => row.speed).filter(speed => 
+      speed !== undefined && speed !== null
+    );
+    if (speeds.length > 0) {
+      const maxSpeedValue = Math.max(...speeds);
+      setMaxSpeed(maxSpeedValue);
+    }
+
+    // Calculate max comfort index and related coordinates
+    const comfortData = data.filter(row => 
+      row.Ride_Comfort_Index !== undefined && 
+      row.Ride_Comfort_Index !== null &&
+      row.coordinate !== undefined &&
+      row.coordinate !== null
+    );
+
+    if (comfortData.length > 0) {
+      // Find max comfort index
+      const maxComfort = Math.max(...comfortData.map(row => row.Ride_Comfort_Index));
+      setMaxComfortIndex(maxComfort);
+
+      // Find coordinates for min comfort index
+      const minComfortRow = comfortData.reduce((min, row) => 
+        row.Ride_Comfort_Index < min.Ride_Comfort_Index ? row : min
+      );
+      setMinComfortCoord(minComfortRow.coordinate);
+
+      // Find coordinates for max comfort index
+      const maxComfortRow = comfortData.reduce((max, row) => 
+        row.Ride_Comfort_Index > max.Ride_Comfort_Index ? row : max
+      );
+      setMaxComfortCoord(maxComfortRow.coordinate);
+    }
+  };
+
   return (
     
     <div className="space-y-4">
+      <input type="file" accept=".csv" onChange={handleFileUpload}/>
       {/* Top Boxes */}
       <div className="grid grid-cols-4 gap-4">
         {/* 1つのボックスは4列幅中の3列分を占有 */}
-        <div className="bg-blue-900 h-24 rounded-md col-span-1">
-          <div className="flex items-center">
-            <Link href="/assessment">
+        <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
+          <div className="flex items-center text-white font-medium"> Max Speed
+            
               <button className="w-full flex items-center gap-2 p-3 rounded">
               <Gauge className="w-5 h-5" /> 
               <span className="text-white font-medium">Assessment</span>
               </button>
-            </Link>
+          
           </div>
+          <div className="text-white text-2xl "> {maxSpeed?.toFixed(2) || 'N/A'} m/s </div>
         </div>
-        <div className="bg-blue-900 h-24 rounded-md col-span-1"></div>
-        <div className="bg-blue-900 h-24 rounded-md col-span-1"></div>
+        <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
+          <div className="text-white font-medium">Max Ride Comfort Index</div>
+          <div className="text-white"> {maxComfortIndex || 'N/A'} </div>
+        </div>
+        <div className="bg-blue-900 h-24 rounded-md col-span-1">
+          <div className="text-white font-medium">Min Comfort Coordinate</div>
+          <div className="text-white"> {minComfortCoord || 'N/A'} </div>
+        </div>
+        <div className="bg-blue-900 h-24 rounded-md col-span-1">
+          <div className="text-white font-medium">Max Comfort Coordinate</div>
+          <div className="text-white"> {maxComfortCoord || 'N/A'} </div>
+        </div>
         {/* 一番右の空白部分（スタイルなし） */}
       </div>
 
