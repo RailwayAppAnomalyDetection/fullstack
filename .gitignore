@@ -39,3 +39,56 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Byte-compiled / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+*.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Cache files
+.cache/
+*.pyc
+
+# VS Code settings
+.vscode/
+
+# PyCharm settings
+.idea/
+
+# macOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Environment variables and secrets
+.env
+*.env
+*.key

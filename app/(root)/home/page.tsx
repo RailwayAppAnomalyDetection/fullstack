@@ -11,26 +11,80 @@ interface DataRow {
   coordinate: string;
 } 
 
+interface PapaParseError {
+  message: string;
+  type: string;
+  code: string;
+  row?: number;
+}
+
 const Home = () => {
   const [maxSpeed, setMaxSpeed] = useState<number | null>(null);
   const [maxComfortIndex, setMaxComfortIndex] = useState<number | null>(null);
   const [minComfortCoord, setMinComfortCoord] = useState<string | null>(null);
   const [maxComfortCoord, setMaxComfortCoord] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleFileUpload = (event : ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]; // Use optional chaining to safely access files
-    if (file) {
-      Papa.parse(file, {
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    setIsProcessing(true);
+    setError(null);
+  
+    try {
+      // Add file type validation
+      if (!file.name.endsWith('.csv')) {
+        throw new Error('Please upload a CSV file');
+      }
+  
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      const response = await fetch('http://localhost:5000/calculate-rci', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      // Add detailed error logging
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server Error Details:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText
+        });
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+  
+      const processedBlob = await response.blob();
+      const text = await processedBlob.text();
+      
+      Papa.parse<DataRow>(text, {
         header: true,
         dynamicTyping: true,
-        complete: (results) => {
-          const data = results.data as DataRow[];
-          calculateStatistics(data);
+        skipEmptyLines: true,
+        complete: (results: Papa.ParseResult<DataRow>) => {
+          if (results.data && results.data.length > 0) {
+            calculateStatistics(results.data);
+          } else {
+            setError('No valid data found in the file');
+          }
         },
-      });
+        error: (error: PapaParseError) => {
+          console.error('Parse Error:', error);
+          setError(`Failed to parse CSV: ${error.message}`);
+        }
+      } as Papa.ParseConfig<DataRow>);
+  
+    } catch (err) {
+      console.error('Upload Error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsProcessing(false);
     }
   };
-
   const calculateStatistics = (data: DataRow[]) => {
     if (data.length === 0) return;
 
@@ -73,10 +127,19 @@ const Home = () => {
   return (
     
     <div className="space-y-4">
-      <input type="file" accept=".csv" onChange={handleFileUpload}/>
       {/* Top Boxes */}
       <div className="grid grid-cols-4 gap-4">
         {/* 1つのボックスは4列幅中の3列分を占有 */}
+        <div>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleFileUpload}
+          disabled={isProcessing}/>
+          {isProcessing && <span>Processing...</span>}
+          {error && <span className="text-red-500">{error}</span>}
+        </div>
+        
         <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
           <div className="flex items-center text-white font-medium"> Max Speed
             
