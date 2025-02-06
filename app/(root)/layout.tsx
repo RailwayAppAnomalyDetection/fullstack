@@ -31,7 +31,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <button className="text-left hover:bg-blue-700 p-2 rounded">View Data</button>
               </Link>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Regular Train</button>
+              <Link href='/training'>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button>
+              </Link>
             </div>
           </details>
           <details className="group">
