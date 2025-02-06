@@ -114,27 +114,18 @@ const ViewData = () => {
   const [data, setData] = useState<DataItem[]>([]);
 
   useEffect(() => {
-    // CSV ファイルの読み込み
-    fetch("/output_select.csv")
-      .then((response) => response.text())
-      .then((csvData) => {
-        const rows = csvData.split("\n").slice(1); // ヘッダーをスキップ
-        const parsedData: DataItem[] = rows
-          .map((row) => {
-            const [Ride_Comfort_Index, latitude, longitude] = row.split(",");
-            if (Ride_Comfort_Index && latitude && longitude) {
-              return {
-                Ride_Comfort_Index: parseFloat(Ride_Comfort_Index),
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
-              };
-            }
-            return null;
-          })
-          .filter((item): item is DataItem => item !== null); // null を除外
-        setData(parsedData);
+    // Fetch map data from Flask backend
+    fetch("http://localhost:5000/api/map-data") // Replace with your Flask server URL
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
       })
-      .catch((error) => console.error("Error loading CSV data:", error));
+      .then((jsonData) => {
+        setData(jsonData); // Set the fetched data
+      })
+      .catch((error) => console.error("Error loading map data:", error));
   }, []);
 
   return (

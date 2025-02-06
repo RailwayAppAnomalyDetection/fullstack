@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 from scipy.fft import fft, ifft, fftfreq
 import os
@@ -105,6 +105,45 @@ def process_csv():
     df_with_rci.to_csv(output_path, index=False)
     
     return send_file(output_path, as_attachment=True)
+
+@app.route('/api/map-data', methods=['GET'])
+@app.route('/api/map-data', methods=['GET'])
+def get_map_data():
+    try:
+        # Get the path to the processed CSV file
+        temp_dir = tempfile.gettempdir()
+        processed_csv_path = os.path.join(temp_dir, 'processed_data.csv')
+        print("Looking for processed CSV file at:", processed_csv_path)
+
+        # Check if the file exists
+        if not os.path.exists(processed_csv_path):
+            return jsonify({"error": "Processed data not found. Please upload and process a CSV file first."}), 404
+
+        # Read the CSV file
+        df = pd.read_csv(processed_csv_path)
+        print("Columns in the CSV file:", df.columns.tolist())  # Log the columns
+
+        # Check if the 'coordinate' column exists
+        if 'coordinate' not in df.columns:
+            return jsonify({"error": "CSV file does not contain a 'coordinate' column."}), 400
+
+        # Split the 'coordinate' column into latitude and longitude
+        try:
+            df[['latitude', 'longitude']] = df['coordinate'].str.split(',', expand=True)
+            df['latitude'] = df['latitude'].astype(float)
+            df['longitude'] = df['longitude'].astype(float)
+        except Exception as e:
+            print("Error splitting coordinate:", str(e))
+            return jsonify({"error": f"Invalid coordinate: {str(e)}"}), 400
+
+        # Select required columns and return as JSON
+        map_data = df[["Ride_Comfort_Index", "latitude", "longitude"]].to_dict(orient='records')
+        print("Map data:", map_data)  # Log the processed data
+        return jsonify(map_data)
+    except Exception as e:
+        print("Unhandled error in /api/map-data:", str(e))  # Log unhandled errors
+        return jsonify({"error": str(e)}), 500
+    
 
 if __name__ == '__main__':
     app.run(port=5000)
