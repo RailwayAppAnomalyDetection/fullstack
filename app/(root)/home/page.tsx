@@ -21,6 +21,7 @@ interface PapaParseError {
 const Home = () => {
   const [maxSpeed, setMaxSpeed] = useState<number | null>(null);
   const [maxComfortIndex, setMaxComfortIndex] = useState<number | null>(null);
+  const [minComfortIndex, setMinComfortIndex] = useState<number | null>(null);
   const [minComfortCoord, setMinComfortCoord] = useState<string | null>(null);
   const [maxComfortCoord, setMaxComfortCoord] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -110,6 +111,9 @@ const Home = () => {
       const maxComfort = Math.max(...comfortData.map(row => row.Ride_Comfort_Index));
       setMaxComfortIndex(maxComfort);
 
+      const minComfort = Math.min(...comfortData.map(row => row.Ride_Comfort_Index));
+      setMinComfortIndex(minComfort);
+
       // Find coordinates for min comfort index
       const minComfortRow = comfortData.reduce((min, row) => 
         row.Ride_Comfort_Index < min.Ride_Comfort_Index ? row : min
@@ -127,10 +131,8 @@ const Home = () => {
   return (
     
     <div className="space-y-4">
-      {/* Top Boxes */}
-      <div className="grid grid-cols-4 gap-4">
-        {/* 1つのボックスは4列幅中の3列分を占有 */}
-        <div>
+      {/* Top Boxes */} 
+      <div>
         <input
           type="file"
           accept=".csv"
@@ -139,6 +141,9 @@ const Home = () => {
           {isProcessing && <span>Processing...</span>}
           {error && <span className="text-red-500">{error}</span>}
         </div>
+      <div className="grid grid-cols-5 gap-4">
+        {/* 1つのボックスは4列幅中の3列分を占有 */}
+       
         
         <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
           <div className="flex items-center text-white font-medium"> Max Speed
@@ -154,6 +159,10 @@ const Home = () => {
         <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
           <div className="text-white font-medium">Max Ride Comfort Index</div>
           <div className="text-white"> {maxComfortIndex || 'N/A'} </div>
+        </div>
+        <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
+          <div className="text-white font-medium">Min Ride Comfort Index</div>
+          <div className="text-white"> {minComfortIndex || 'N/A'} </div>
         </div>
         <div className="bg-blue-900 h-24 rounded-md col-span-1">
           <div className="text-white font-medium">Min Comfort Coordinate</div>

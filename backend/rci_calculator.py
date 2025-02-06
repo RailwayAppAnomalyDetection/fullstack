@@ -70,7 +70,7 @@ def calculate_nmv(row):
     z_p95 = np.percentile(z_weighted, 95)
 
     # NMV formula with adjustable scaling factor
-    scaling_factor = 0.1  # Adjust this value as needed
+    scaling_factor = 0.01  # Adjust this value as needed
     nmv = scaling_factor * np.sqrt(x_p95**2 + y_p95**2 + z_p95**2)
     return nmv
 
