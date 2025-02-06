@@ -4,6 +4,7 @@
 import { Gauge } from "lucide-react";
 import Papa from "papaparse";
 import React, { ChangeEvent, useState } from 'react'
+import SpeedBox from "@/app/components/SpeedBox";
 
 interface DataRow {
   speed: number;
@@ -145,33 +146,14 @@ const Home = () => {
         {/* 1つのボックスは4列幅中の3列分を占有 */}
        
         
-        <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
-          <div className="flex items-center text-white font-medium"> Max Speed
-            
-              <button className="w-full flex items-center gap-2 p-3 rounded">
-              <Gauge className="w-5 h-5" /> 
-              <span className="text-white font-medium">Assessment</span>
-              </button>
-          
-          </div>
-          <div className="text-white text-2xl "> {maxSpeed?.toFixed(2) || 'N/A'} m/s </div>
-        </div>
-        <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
-          <div className="text-white font-medium">Max Ride Comfort Index</div>
-          <div className="text-white"> {maxComfortIndex || 'N/A'} </div>
-        </div>
-        <div className="bg-blue-900 h-24 rounded-md col-span-1 p-4">
-          <div className="text-white font-medium">Min Ride Comfort Index</div>
-          <div className="text-white"> {minComfortIndex || 'N/A'} </div>
-        </div>
-        <div className="bg-blue-900 h-24 rounded-md col-span-1">
-          <div className="text-white font-medium">Min Comfort Coordinate</div>
-          <div className="text-white"> {minComfortCoord || 'N/A'} </div>
-        </div>
-        <div className="bg-blue-900 h-24 rounded-md col-span-1">
-          <div className="text-white font-medium">Max Comfort Coordinate</div>
-          <div className="text-white"> {maxComfortCoord || 'N/A'} </div>
-        </div>
+        
+        
+          <SpeedBox title={<><span className="flex items-center gap-3"><Gauge className="w-5 h-5"/>Max Speed</span></>} value={maxSpeed ?? undefined} unit="m/s" /> 
+          <SpeedBox title={<><span className="flex items-center gap-3">Max Comfort Index</span></>} value={maxComfortIndex ?? undefined} unit="" />
+          <SpeedBox title={<><span className="flex items-center gap-3">Min Comfort Index</span></>} value={minComfortIndex ?? undefined} unit="" />
+          <SpeedBox title={<><span className="flex items-center gap-3">Min Comfort Coord</span></>} value={minComfortCoord ?? undefined} unit="" />
+          <SpeedBox title={<><span className="flex items-center gap-3">Max Comfort Coord</span></>} value={maxComfortCoord ?? undefined} unit="" />
+        
         {/* 一番右の空白部分（スタイルなし） */}
       </div>
 
