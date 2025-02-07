@@ -160,6 +160,12 @@ const ViewData = () => {
           ))}
         </MapContainer>
       </div>
+      <div>
+        <div className="bg-blue-500 h-10 flex items-center justify-center text-2xl font-semibold">{"< 5"}</div>
+        <div className="bg-green-500 h-10 flex items-center justify-center text-2xl font-semibold">{"< 10"}</div>
+        <div className="bg-yellow-500 h-10 flex items-center justify-center text-2xl font-semibold">{"< 15"}</div>
+        <div className="bg-orange-500 h-10 flex items-center justify-center text-2xl font-semibold">{"< 20"}</div>
+      </div>
     </div>
   );
 };
