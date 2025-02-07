@@ -144,10 +144,6 @@ const Home = () => {
         </div>
       <div className="grid grid-cols-5 gap-4">
         {/* 1つのボックスは4列幅中の3列分を占有 */}
-       
-        
-        
-        
           <SpeedBox title={<><span className="flex items-center gap-3"><Gauge className="w-5 h-5"/>Max Speed</span></>} value={maxSpeed ?? undefined} unit="m/s" /> 
           <SpeedBox title={<><span className="flex items-center gap-3">Max Comfort Index</span></>} value={maxComfortIndex ?? undefined} unit="" />
           <SpeedBox title={<><span className="flex items-center gap-3">Min Comfort Index</span></>} value={minComfortIndex ?? undefined} unit="" />
