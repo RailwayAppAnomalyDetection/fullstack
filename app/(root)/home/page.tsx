@@ -1,6 +1,5 @@
 "use client"
-// pages/index.tsx
-//import Layout from "../layout";
+
 import { Gauge } from "lucide-react";
 import Papa from "papaparse";
 import React, { ChangeEvent, useState } from 'react'
@@ -10,7 +9,7 @@ interface DataRow {
   speed: number;
   Ride_Comfort_Index: number;
   coordinate: string;
-} 
+}
 
 interface PapaParseError {
   message: string;
@@ -31,25 +30,23 @@ const Home = () => {
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-  
+
     setIsProcessing(true);
     setError(null);
-  
+
     try {
-      // Add file type validation
       if (!file.name.endsWith('.csv')) {
         throw new Error('Please upload a CSV file');
       }
-  
+
       const formData = new FormData();
       formData.append('file', file);
-  
+
       const response = await fetch('http://localhost:5000/calculate-rci', {
         method: 'POST',
         body: formData,
       });
-  
-      // Add detailed error logging
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Server Error Details:', {
@@ -59,7 +56,7 @@ const Home = () => {
         });
         throw new Error(`Server error: ${response.status} ${response.statusText}`);
       }
-  
+
       const processedBlob = await response.blob();
       const text = await processedBlob.text();
       
@@ -68,6 +65,7 @@ const Home = () => {
         dynamicTyping: true,
         skipEmptyLines: true,
         complete: (results: Papa.ParseResult<DataRow>) => {
+          console.log("Parsed data sample:", results.data.slice(0, 5));
           if (results.data && results.data.length > 0) {
             calculateStatistics(results.data);
           } else {
@@ -78,8 +76,8 @@ const Home = () => {
           console.error('Parse Error:', error);
           setError(`Failed to parse CSV: ${error.message}`);
         }
-      } as Papa.ParseConfig<DataRow>);
-  
+      });
+
     } catch (err) {
       console.error('Upload Error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -87,45 +85,68 @@ const Home = () => {
       setIsProcessing(false);
     }
   };
+
   const calculateStatistics = (data: DataRow[]) => {
-    if (data.length === 0) return;
+    if (!data || data.length === 0) {
+      console.warn("No data provided to calculateStatistics");
+      return;
+    }
+
+    // Debug log
+    console.log("Processing data for statistics:", {
+      totalRows: data.length,
+      sampleRow: data[0]
+    });
 
     // Calculate max speed
-    const speeds = data.map(row => row.speed).filter(speed => 
-      speed !== undefined && speed !== null
-    );
-    if (speeds.length > 0) {
-      const maxSpeedValue = Math.max(...speeds);
+    const validSpeeds = data
+      .map(row => row.speed)
+      .filter((speed): speed is number => 
+        typeof speed === 'number' && !isNaN(speed) && speed > 0
+      );
+
+    if (validSpeeds.length > 0) {
+      const maxSpeedValue = Math.max(...validSpeeds);
       setMaxSpeed(maxSpeedValue);
     }
 
-    // Calculate max comfort index and related coordinates
+    // Process comfort index data
     const comfortData = data.filter(row => 
-      row.Ride_Comfort_Index !== undefined && 
-      row.Ride_Comfort_Index !== null &&
-      row.coordinate !== undefined &&
-      row.coordinate !== null
+      typeof row.Ride_Comfort_Index === 'number' && 
+      !isNaN(row.Ride_Comfort_Index) &&
+      row.coordinate
     );
 
+    console.log("Filtered comfort data:", {
+      totalComfortRows: comfortData.length,
+      sample: comfortData.slice(0, 3)
+    });
+
     if (comfortData.length > 0) {
-      // Find max comfort index
-      const maxComfort = Math.max(...comfortData.map(row => row.Ride_Comfort_Index));
-      setMaxComfortIndex(maxComfort);
-
-      const minComfort = Math.min(...comfortData.map(row => row.Ride_Comfort_Index));
-      setMinComfortIndex(minComfort);
-
-      // Find coordinates for min comfort index
-      const minComfortRow = comfortData.reduce((min, row) => 
-        row.Ride_Comfort_Index < min.Ride_Comfort_Index ? row : min
+      // Find max comfort index and its coordinate
+      const maxRow = comfortData.reduce((max, current) => 
+        (current.Ride_Comfort_Index > max.Ride_Comfort_Index) ? current : max
       );
-      setMinComfortCoord(minComfortRow.coordinate);
+      setMaxComfortIndex(maxRow.Ride_Comfort_Index);
+      setMaxComfortCoord(maxRow.coordinate);
 
-      // Find coordinates for max comfort index
-      const maxComfortRow = comfortData.reduce((max, row) => 
-        row.Ride_Comfort_Index > max.Ride_Comfort_Index ? row : max
+      // Find min comfort index and its coordinate
+      const minRow = comfortData.reduce((min, current) => 
+        (current.Ride_Comfort_Index < min.Ride_Comfort_Index) ? current : min
       );
-      setMaxComfortCoord(maxComfortRow.coordinate);
+      setMinComfortIndex(minRow.Ride_Comfort_Index);
+      setMinComfortCoord(minRow.coordinate);
+
+      console.log("Calculated comfort indices:", {
+        max: {
+          value: maxRow.Ride_Comfort_Index,
+          coordinate: maxRow.coordinate
+        },
+        min: {
+          value: minRow.Ride_Comfort_Index,
+          coordinate: minRow.coordinate
+        }
+      });
     }
   };
 
@@ -137,6 +158,7 @@ const Home = () => {
         <input
           type="file"
           accept=".csv"
+          multiple
           onChange={handleFileUpload}
           disabled={isProcessing}/>
           {isProcessing && <span>Processing...</span>}
