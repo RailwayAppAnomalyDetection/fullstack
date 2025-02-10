@@ -12,21 +12,23 @@ type DataItem = {
 };
 
 const getColorByIndex = (Ride_Comfort_Index: number): string => {
-  if (Ride_Comfort_Index < 5) return "blue";
-  if (Ride_Comfort_Index < 10) return "green"; 
-  if (Ride_Comfort_Index < 20) return "yellow"; 
-  if (Ride_Comfort_Index < 50) return "orange"; 
-  return "red"; 
+  if (Ride_Comfort_Index < 1) return "blue";
+  if (Ride_Comfort_Index < 2) return "green"; 
+  if (Ride_Comfort_Index < 3) return "yellow"; 
+  if (Ride_Comfort_Index < 4) return "orange"; 
+  if (Ride_Comfort_Index < 5) return "red"; 
+  return "darkred"; 
 };
 
 const ViewData = () => {
   const [data, setData] = useState<DataItem[]>([]);
   const [rciCounts, setRciCounts] = useState({
-    lessThan5: 0,
-    from5To10: 0,
-    from10To20: 0,
-    from20To50: 0,
-    greaterOrEqual50: 0,
+    lessThan1: 0,
+    from1To2: 0,
+    from2To3: 0,
+    from3To4: 0,
+    from4To5: 0,
+    greaterOrEqua5: 0,
   });
 
   useEffect(() => {
@@ -43,17 +45,20 @@ const ViewData = () => {
 
         // Calculate counts for RCI ranges
         const counts = {
-          lessThan5: jsonData.filter((item: DataItem) => item.Ride_Comfort_Index < 5).length,
-          from5To10: jsonData.filter(
-            (item: DataItem) => item.Ride_Comfort_Index >= 5 && item.Ride_Comfort_Index < 10
+          lessThan1: jsonData.filter((item: DataItem) => item.Ride_Comfort_Index < 1).length,
+          from1To2: jsonData.filter(
+            (item: DataItem) => item.Ride_Comfort_Index >= 1 && item.Ride_Comfort_Index < 2
           ).length,
-          from10To20: jsonData.filter(
-            (item: DataItem) => item.Ride_Comfort_Index >= 10 && item.Ride_Comfort_Index < 20
+          from2To3: jsonData.filter(
+            (item: DataItem) => item.Ride_Comfort_Index >= 2 && item.Ride_Comfort_Index < 3
           ).length,
-          from20To50: jsonData.filter(
-            (item: DataItem) => item.Ride_Comfort_Index >= 20 && item.Ride_Comfort_Index < 50
+          from3To4: jsonData.filter(
+            (item: DataItem) => item.Ride_Comfort_Index >= 3 && item.Ride_Comfort_Index < 4
           ).length,
-          greaterOrEqual50: jsonData.filter((item: DataItem) => item.Ride_Comfort_Index >= 50).length,
+          from4To5: jsonData.filter(
+            (item: DataItem) => item.Ride_Comfort_Index >= 4 && item.Ride_Comfort_Index < 5
+          ).length,
+          greaterOrEqua5: jsonData.filter((item: DataItem) => item.Ride_Comfort_Index >= 5).length,
         };
         setRciCounts(counts);
       })
@@ -63,12 +68,13 @@ const ViewData = () => {
   return (
     <div className="space-y-4">
       {/* Top Boxes */}
-      <div className="grid grid-cols-5 gap-4">
-        <SpeedBox title="RCI < 5" value={rciCounts.lessThan5} unit="values" />
-        <SpeedBox title="5 ≤ RCI < 10" value={rciCounts.from5To10} unit="values" />
-        <SpeedBox title="10 ≤ RCI < 20" value={rciCounts.from10To20} unit="values" />
-        <SpeedBox title="20 ≤ RCI < 50" value={rciCounts.from20To50} unit="values" />
-        <SpeedBox title="RCI ≤ 50" value={rciCounts.greaterOrEqual50} unit="values" />
+      <div className="grid grid-cols-6 gap-4">
+        <SpeedBox title="RCI < 1" value={rciCounts.lessThan1} unit="values" />
+        <SpeedBox title="1 ≤ RCI < 2" value={rciCounts.from1To2} unit="values" />
+        <SpeedBox title="2 ≤ RCI < 3" value={rciCounts.from2To3} unit="values" />
+        <SpeedBox title="3 ≤ RCI < 4" value={rciCounts.from3To4} unit="values" />
+        <SpeedBox title="4 ≤ RCI < 5" value={rciCounts.from4To5} unit="values" />
+        <SpeedBox title="RCI ≤ 5" value={rciCounts.greaterOrEqua5} unit="values" />
       </div>
 
 

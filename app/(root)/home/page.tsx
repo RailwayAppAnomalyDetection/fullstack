@@ -72,11 +72,12 @@ const Home = () => {
             setError('No valid data found in the file');
           }
         },
-        error: (error: PapaParseError) => {
+        error: (error: Error) => {
           console.error('Parse Error:', error);
           setError(`Failed to parse CSV: ${error.message}`);
         }
       });
+      
 
     } catch (err) {
       console.error('Upload Error:', err);
