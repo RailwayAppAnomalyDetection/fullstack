@@ -73,7 +73,8 @@ const ViewData = () => {
         <SpeedBox title="1 ≤ RCI < 2" value={rciCounts.from1To2} unit="values" />
         <SpeedBox title="2 ≤ RCI < 3" value={rciCounts.from2To3} unit="values" />
         <SpeedBox title="3 ≤ RCI < 4" value={rciCounts.from3To4} unit="values" />
-        <SpeedBox title="4 ≤ RCI <5" value={rciCounts.from4To5} unit="values" />
+
+        <SpeedBox title="4 ≤ RCI < 5" value={rciCounts.from4To5} unit="values" />
         <SpeedBox title="RCI ≤ 5" value={rciCounts.greaterOrEqua5} unit="values" />
       </div>
 
