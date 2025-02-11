@@ -125,6 +125,12 @@ def process_csv():
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
         
+        # Filter out rows with pdop > 1000
+        if 'pdop' in df.columns:
+            df = df[df['pdop'] <= 1000]
+            if len(df) == 0:
+                return jsonify({"error": "All rows filtered out due to pdop > 1000"}), 400
+        
         # Process acceleration columns
         for col in ['X', 'Y', 'Z']:
             if col not in df.columns:
@@ -159,7 +165,8 @@ def process_csv():
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-    
+
+
 @app.route('/api/map-data', methods=['GET'])
 def get_map_data():
     try:
@@ -174,8 +181,13 @@ def get_map_data():
         df = pd.read_csv(processed_csv_path)
         
         # Check if the required columns exist
-        if 'coordinate' not in df.columns or 'Ride_Comfort_Index' not in df.columns:
+        if 'coordinate' not in df.columns or 'Ride_Comfort_Index' not in df.columns or 'pdop' not in df.columns:
             return jsonify({"error": "Required columns missing in processed data."}), 400
+        
+        # Filter out rows with pdop > 1000
+        df = df[df['pdop'] <= 1000]
+        if len(df) == 0:
+            return jsonify({"error": "All rows filtered out due to pdop > 1000"}), 400
         
         try:
             # Handle potential NaN or invalid values
