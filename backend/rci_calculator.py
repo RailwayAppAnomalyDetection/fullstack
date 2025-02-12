@@ -1,3 +1,5 @@
+import datetime
+import glob
 import pandas as pd
 import numpy as np
 from flask import Flask, request, send_file, jsonify
@@ -172,13 +174,16 @@ def process_csv():
         df['Ride_Comfort_Index'] = df['Ride_Comfort_Index'].astype(float)
         
         # Save processed data
+        # Generate unique filename for each processed files
+        timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'processed_data_{timestamp}.csv'
         temp_dir = tempfile.gettempdir()
-        output_path = os.path.join(temp_dir, 'processed_data.csv')
+        output_path = os.path.join(temp_dir, filename)
         
         # Convert to CSV with specific handling for numeric columns
         df.to_csv(output_path, index=False, float_format='%.6f')
         
-        return send_file(output_path, as_attachment=True, download_name='processed_data.csv')
+        return send_file(output_path, as_attachment=True, download_name=filename)
     
     except Exception as e:
         print(f"Unhandled error: {str(e)}")
@@ -198,62 +203,81 @@ def get_map_data():
     try:
         # Get the path to the processed CSV file
         temp_dir = tempfile.gettempdir()
-        processed_csv_path = os.path.join(temp_dir, 'processed_data.csv')
+        processed_files = glob.glob(os.path.join(temp_dir, 'processed_data_*.csv'))
         
-        if not os.path.exists(processed_csv_path):
-            return jsonify({"error": "Processed data not found. Please upload and process a CSV file first."}), 404
+        print(f'Found {len(processed_files)} processed files')
+
+        if not processed_files:
+            return jsonify({"error": "Processed data not found. Please upload and process CSV file(s) first."}), 404
         
         # Read the CSV file
-        df = pd.read_csv(processed_csv_path)
-        
-        # Check if the required columns exist
-        if 'coordinate' not in df.columns or 'Ride_Comfort_Index' not in df.columns or 'pdop' not in df.columns:
-            return jsonify({"error": "Required columns missing in processed data."}), 400
-        
-        # Filter out rows with pdop > 1000
-        df = df[df['pdop'] <= 1000]
-        if len(df) == 0:
-            return jsonify({"error": "All rows filtered out due to pdop > 1000"}), 400
-        
-        try:
-            # Handle potential NaN or invalid values
-            df['coordinate'] = df['coordinate'].fillna('')
+        all_data = []
+        for file_path in processed_files:
+            df = pd.read_csv(file_path)
+            print(f"Processing file: {file_path}: {len(df)} rows")
+
+            # Check if the required columns exist
+            if 'coordinate' not in df.columns or 'Ride_Comfort_Index' not in df.columns or 'pdop' not in df.columns:
+                return jsonify({"error": "Required columns missing in processed data."}), 400
             
-            # Split coordinates and convert to float
-            df[['latitude', 'longitude']] = df['coordinate'].str.split(',', expand=True)
-            df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
-            df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
-            
-            # Ensure Ride_Comfort_Index is numeric
-            df['Ride_Comfort_Index'] = pd.to_numeric(df['Ride_Comfort_Index'], errors='coerce')
-            
-            # Drop rows with invalid data
-            df = df.dropna(subset=['latitude', 'longitude', 'Ride_Comfort_Index'])
-            
+            # Filter out rows with pdop > 1000
+            df = df[df['pdop'] <= 1000]
             if len(df) == 0:
-                return jsonify({"error": "No valid data points found"}), 400
+                return jsonify({"error": "All rows filtered out due to pdop > 1000"}), 400
             
-            # Create the response data
-            map_data = []
-            for _, row in df.iterrows():
-                map_data.append({
-                    "Ride_Comfort_Index": float(row["Ride_Comfort_Index"]),
-                    "latitude": float(row["latitude"]),
-                    "longitude": float(row["longitude"])
-                })
-            
-            return jsonify(map_data)
-            
-        except Exception as e:
-            print(f"Error processing coordinates: {e}")
-            return jsonify({"error": f"Invalid data format: {str(e)}"}), 400
+            try:
+                # Handle potential NaN or invalid values
+                df['coordinate'] = df['coordinate'].fillna('')
+                
+                # Split coordinates and convert to float
+                df[['latitude', 'longitude']] = df['coordinate'].str.split(',', expand=True)
+                df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
+                df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
+                
+                # Ensure Ride_Comfort_Index is numeric
+                df['Ride_Comfort_Index'] = pd.to_numeric(df['Ride_Comfort_Index'], errors='coerce')
+                
+                # Drop rows with invalid data
+                df = df.dropna(subset=['latitude', 'longitude', 'Ride_Comfort_Index'])
+                
+                if len(df) == 0:
+                    return jsonify({"error": "No valid data points found"}), 400
+                
+                for _, row in df.iterrows():
+                    all_data.append({
+                        "Ride_Comfort_Index": float(row["Ride_Comfort_Index"]),
+                        "latitude": float(row["latitude"]),
+                        "longitude": float(row["longitude"])
+                    })
+            except Exception as e:
+                print(f"Error processing coordinates: {e}")
+                return jsonify({"error": f"Invalid data format: {str(e)}"}), 400
+                        
+
+            print(f"Total data points: {len(all_data)}")
+            return jsonify(all_data)
         
+        
+            
+           
     except Exception as e:
         print(f"Unhandled error in /api/map-data: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/clear-data', methods=['POST'])
+def clear_data():
+    try:
+        temp_dir = tempfile.gettempdir()
+        processed_files = glob.glob(os.path.join(temp_dir, 'processed_data_*.csv'))
+
+        for file_path in processed_files:
+            os.remove(file_path)
+
+        return jsonify({"message": "All processed data files have been deleted."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(port=5000)
