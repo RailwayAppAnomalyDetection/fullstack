@@ -25,6 +25,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link href='/viewdata'>
               <button className={`w-full text-left hover:bg-blue-700 p-2 rounded ${isActive("/viewdata") ? "bg-blue-600" : "hover:bg-blue-700"}`}>View Data</button>
               </Link>
+              <Link href='/averagedata'>
+              <button className={`w-full text-left hover:bg-blue-700 p-2 rounded ${isActive("/averagedata") ? "bg-blue-600" : "hover:bg-blue-700"}`}>Average data</button>
+              </Link>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Regular Train</button>
               <Link href='/training'>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button>
@@ -59,6 +62,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <button className="hover:bg-blue-700 p-2 rounded">
               <span className="material-icons"><Gauge/></span>
             </button>
+            </Link>
+            <Link href="/averagedata">
+            <button className="hover:bg-blue-700 p-2 rounded">
+              <span className="material-icons"><Gauge/></span>
+            </button>            
             </Link>
             <button className="hover:bg-blue-700 p-2 rounded">
               <span className="material-icons"><Grid3x3/></span>
