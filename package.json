@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "concurrently \"npm run next\" \"npm run flask\"",
+    "next": "next dev --turbopack",
+    "flask": "cd backend && python rci_calculator.py",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -29,6 +31,7 @@
     "@types/papaparse": "^5.3.15",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
     "eslint": "^9",
     "eslint-config-next": "15.1.5",
     "postcss": "^8",
