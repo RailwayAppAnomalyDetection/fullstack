@@ -2,7 +2,7 @@
 
 import { Gauge } from "lucide-react";
 import Papa from "papaparse";
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import SpeedBox from "@/app/components/SpeedBox";
 
 interface DataRow {
@@ -11,12 +11,12 @@ interface DataRow {
   coordinate: string;
 }
 
-interface PapaParseError {
-  message: string;
-  type: string;
-  code: string;
-  row?: number;
-}
+// interface PapaParseError {
+//   message: string;
+//   type: string;
+//   code: string;
+//   row?: number;
+// }
 
 const Home = () => {
   const [maxSpeed, setMaxSpeed] = useState<number | null>(null);
@@ -26,6 +26,9 @@ const Home = () => {
   const [maxComfortCoord, setMaxComfortCoord] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  //State for accumulated data
+  const [accumulatedData, setAccumulatedData] = useState<DataRow[]>([]);
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -67,7 +70,12 @@ const Home = () => {
         complete: (results: Papa.ParseResult<DataRow>) => {
           console.log("Parsed data sample:", results.data.slice(0, 5));
           if (results.data && results.data.length > 0) {
-            calculateStatistics(results.data);
+            //Accumulate the new data with eisting data
+            setAccumulatedData(prevData => {
+              const newData = [...prevData, ...results.data];
+              calculateStatistics(newData); //Calculate statistics on all accumulated data
+              return newData;
+            });
           } else {
             setError('No valid data found in the file');
           }
@@ -86,7 +94,22 @@ const Home = () => {
       setIsProcessing(false);
     }
   };
+  //reset state variables
+  const clearData = () => {
+    setAccumulatedData([]);
+    setMaxSpeed(null);
+    setMaxComfortIndex(null);
+    setMinComfortIndex(null);
+    setMinComfortCoord(null);
+    setMaxComfortCoord(null);
+  }
 
+  useEffect(() => {
+    console.log("Accumulated data updated:", {
+      totalRows: accumulatedData.length,
+      sampleRow: accumulatedData.slice(0,5)
+    });
+  }, [accumulatedData]);
   const calculateStatistics = (data: DataRow[]) => {
     if (!data || data.length === 0) {
       console.warn("No data provided to calculateStatistics");
@@ -94,6 +117,12 @@ const Home = () => {
     }
 
     // Debug log
+    console.log("Processing accumulated data:",{
+      totalFiles: "Number of files processed so far",
+      totalRows: data.length,
+      sampleRows: data.slice(0,5)
+    })
+
     console.log("Processing data for statistics:", {
       totalRows: data.length,
       sampleRow: data[0]
@@ -205,7 +234,11 @@ const Home = () => {
           </small>
         </div>
       </div>
-
+      <div>
+      <button onClick={clearData} className="bg-red-500 text-white px-4 py-2 rounded">
+        Reset Data
+      </button>
+      </div>
     </div>
 
   );
