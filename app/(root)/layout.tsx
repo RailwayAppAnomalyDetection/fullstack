@@ -28,7 +28,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link href='/view100mdata'>
               <button className={`w-full text-left hover:bg-blue-700 p-2 rounded ${isActive("/view100mdata") ? "bg-blue-600" : "hover:bg-blue-700"}`}>View Data for Each 100m</button>
               </Link>
-              <Link href='/training'>
+              <Link href='/mergecsv'>
               <button className="text-left hover:bg-blue-700 p-2 rounded">Training</button>
               </Link>
             </div>

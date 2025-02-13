@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@next/font": "^14.2.15",
+    "@types/formidable": "^3.4.5",
     "ai": "^4.1.1",
+    "formidable": "^3.5.2",
     "fullstack": "file:",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
