@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaf
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import SpeedBox from "@/app/components/SpeedBox";
-import { Crosshair } from "lucide-react";
+import { Crosshair, Filter } from "lucide-react";
 
 type DataItem = {
   Ride_Comfort_Index: number;
@@ -27,9 +27,20 @@ const getColorByIndex = (Ride_Comfort_Index: number): string => {
   return "darkred";
 };
 
-// Function to convert meters to degrees (approximate)
+// Function to calculate circle radius based on count
+const getRadiusByCount = (count: number): number => {
+  // Min radius is 3, max is 12, logarithmic scale
+  return Math.max(3, Math.min(12, 3 * Math.log2(count + 1)));
+};
+
+// Function to calculate opacity based on count
+const getOpacityByCount = (count: number): number => {
+  // Min opacity is 0.3, max is 0.9, linear scale
+  return Math.min(0.9, 0.3 + (count / 50));
+};
+
 const metersToDegreesLat = (meters: number): number => {
-  return meters / 111111; // 1 degree of latitude is approximately 111,111 meters
+  return meters / 111111;
 };
 
 const metersToDegreesLng = (meters: number, lat: number): number => {
@@ -95,7 +106,10 @@ const MapController = ({ data, focusHighest }: { data: GridCell[], focusHighest:
 
 const ViewData = () => {
   const [gridData, setGridData] = useState<GridCell[]>([]);
+  const [filteredData, setFilteredData] = useState<GridCell[]>([]);
   const [focusHighest, setFocusHighest] = useState(false);
+  const [minReadings, setMinReadings] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
   const [rciCounts, setRciCounts] = useState({
     lessThan1: 0,
     from1To2: 0,
@@ -104,6 +118,23 @@ const ViewData = () => {
     from4To5: 0,
     greaterOrEqua5: 0,
   });
+
+  // Function to apply filters
+  const applyFilters = (data: GridCell[]) => {
+    const filtered = data.filter(cell => cell.count >= minReadings);
+    setFilteredData(filtered);
+    
+    // Update counts based on filtered data
+    const counts = {
+      lessThan1: filtered.filter(cell => cell.avgRCI < 1).length,
+      from1To2: filtered.filter(cell => cell.avgRCI >= 1 && cell.avgRCI < 2).length,
+      from2To3: filtered.filter(cell => cell.avgRCI >= 2 && cell.avgRCI < 3).length,
+      from3To4: filtered.filter(cell => cell.avgRCI >= 3 && cell.avgRCI < 4).length,
+      from4To5: filtered.filter(cell => cell.avgRCI >= 4 && cell.avgRCI < 5).length,
+      greaterOrEqua5: filtered.filter(cell => cell.avgRCI >= 5).length,
+    };
+    setRciCounts(counts);
+  };
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/map-data?t=${Date.now()}`, {
@@ -119,20 +150,15 @@ const ViewData = () => {
       .then(jsonData => {
         const gridCells = groupDataIntoGrid(jsonData);
         setGridData(gridCells);
-
-        // Calculate counts based on grid cell averages
-        const counts = {
-          lessThan1: gridCells.filter(cell => cell.avgRCI < 1).length,
-          from1To2: gridCells.filter(cell => cell.avgRCI >= 1 && cell.avgRCI < 2).length,
-          from2To3: gridCells.filter(cell => cell.avgRCI >= 2 && cell.avgRCI < 3).length,
-          from3To4: gridCells.filter(cell => cell.avgRCI >= 3 && cell.avgRCI < 4).length,
-          from4To5: gridCells.filter(cell => cell.avgRCI >= 4 && cell.avgRCI < 5).length,
-          greaterOrEqua5: gridCells.filter(cell => cell.avgRCI >= 5).length,
-        };
-        setRciCounts(counts);
+        applyFilters(gridCells);
       })
       .catch(error => console.error("Error loading map data:", error));
   }, []);
+
+  // Apply filters when minReadings changes
+  useEffect(() => {
+    applyFilters(gridData);
+  }, [minReadings, gridData]);
 
   const handleFocusHighest = () => setFocusHighest(prev => !prev);
 
@@ -147,6 +173,7 @@ const ViewData = () => {
       .then(jsonData => {
         const gridCells = groupDataIntoGrid(jsonData);
         setGridData(gridCells);
+        applyFilters(gridCells);
       })
       .catch(error => console.error("Error refreshing data:", error));
   };
@@ -162,7 +189,15 @@ const ViewData = () => {
         <SpeedBox title="RCI > 5" value={rciCounts.greaterOrEqua5} unit="areas" />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <button 
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg"
+        >
+          <Filter className="mr-2"/>
+          <span>{showFilters ? "Hide Filters" : "Show Filters"}</span>
+        </button>
+
         <button 
           onClick={handleFocusHighest}
           className="
@@ -176,10 +211,31 @@ const ViewData = () => {
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
           "
         >
-          <Crosshair/>
+          <Crosshair className="mr-2"/>
           <span>{focusHighest ? "Show Full Map" : "Focus on Highest RCI"}</span>
         </button>
       </div>
+
+      {showFilters && (
+        <div className="bg-gray-100 p-4 rounded-lg">
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center space-x-2">
+              <span>Minimum Readings:</span>
+              <input
+                type="number"
+                min="1"
+                value={minReadings}
+                onChange={(e) => setMinReadings(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-20 px-2 py-1 border rounded"
+              />
+            </label>
+            <div className="flex-grow"></div>
+            <div className="text-sm text-gray-600">
+              Showing {filteredData.length} of {gridData.length} areas
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="h-96 rounded-md overflow-hidden">
         <MapContainer center={[-7.797068, 110.370529]} zoom={15} className="h-full w-full">
@@ -187,14 +243,14 @@ const ViewData = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {gridData.map((cell, index) => (
+          {filteredData.map((cell, index) => (
             <CircleMarker
               key={index}
               center={[cell.centerLat, cell.centerLng]}
-              radius={5} // Increased radius for better visibility of grid cells
+              radius={getRadiusByCount(cell.count)}
               color={getColorByIndex(cell.avgRCI)}
               fillColor={getColorByIndex(cell.avgRCI)}
-              fillOpacity={0.7}
+              fillOpacity={getOpacityByCount(cell.count)}
             >
               <Popup>
                 <div>
@@ -204,7 +260,7 @@ const ViewData = () => {
               </Popup>
             </CircleMarker>
           ))}
-          <MapController data={gridData} focusHighest={focusHighest} />
+          <MapController data={filteredData} focusHighest={focusHighest} />
         </MapContainer>
       </div>
       <button 
